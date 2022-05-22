@@ -1,0 +1,28 @@
+- name: Rasbian install
+  include_tasks: raspbian.yml
+  when: ansible_lsb.id == "Raspbian"
+
+- name: Install
+  include_tasks: install.yml
+  when: ansible_lsb.id != "Raspbian"
+
+- name: enable docker
+  service:
+    name: docker.service
+    state: started
+    enabled: yes
+  become: yes
+
+- name: enable containerd
+  service:
+    name: containerd.service
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Add user to docker group
+  user:
+    name: '{{ ansible_user }}'
+    groups: docker
+    append: yes
+  become: yes

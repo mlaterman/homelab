@@ -1,0 +1,11 @@
+[pi]
+192.168.68.106
+
+[pi:vars]
+ansible_user=ubuntu
+
+[pihole]
+192.168.68.107
+
+[pihole:vars]
+ansible_user=pi
