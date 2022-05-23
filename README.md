@@ -16,3 +16,21 @@ Pihole will run under docker compose on an instance.
 Systemd is used to ensure it starts on system boot
 
 After deploying pihole set the primary DNS setting (in DHCP options) on the router to pihole's IP.
+
+## media server
+
+The Media server runs jellyfin, qbittorrent, sonarr, and radarr in docker compose.
+
+The drive that is used by the media server should have the following structure:
+```
+/apps/
+  qbittorrent/
+  sonarr/
+  radarr/
+  jellyfin/
+/data/
+  media/
+    movies/
+    tvshows/
+  torrent/
+```

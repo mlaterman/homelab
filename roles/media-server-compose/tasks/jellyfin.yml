@@ -1,0 +1,6 @@
+- name: Add user to video group
+  user:
+    name: "{{ media_server_user }}"
+    groups: video
+    append: yes
+  become: yes

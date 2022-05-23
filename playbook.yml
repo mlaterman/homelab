@@ -6,3 +6,7 @@
 - hosts: pihole
   roles:
     - pihole-compose
+
+- hosts: pi
+  roles:
+    - media-server-compose

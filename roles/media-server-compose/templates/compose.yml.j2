@@ -1,0 +1,73 @@
+version: "3"
+
+services:
+  jellyfin:
+    image: hotio/jellyfin
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - GUID=1000
+      - TZ=America/Vancouver
+      - UMASK_SET=022
+      - JELLYFIN_DATA_DIR=/data/media
+      # Optional - alternative address used for autodiscovery
+      #- JELLYFIN_PublishedServerUrl=http://example.com
+    volumes:
+      - /mnt/jellydata/apps/jellyfin:/config
+      - /mnt/jellydata/data/media:/data/media
+    devices:
+      - /dev/vchiq:/dev/vchiq
+      - /dev/video10:/dev/video10
+      - /dev/video11:/dev/video11
+      - /dev/video12:/dev/video12
+    ports:
+      - 8096:8096 # Jellyfin UI
+      - 7359:7359/udp #optional jellyfin client discovery
+      - 1900:1900/udp #optional DNLA discovery
+      #- 8920:8920 # optional https UI
+    restart: "unless-stopped"
+  qbittorrent:
+    image: hotio/qbittorrent
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Vancouver
+      - UMASK_SET=022
+      #- WEBUI_PORT=8080
+    volumes:
+      - /mnt/jellydata/apps/qbittorrent:/config
+      - /mnt/jellydata/data/torrent:/data/torrent
+    ports:
+      - "8080:8080" # web UI port
+      #- "6881:6881" # tcp connection port
+      #- "6881:6881/udp" # udp connection port
+    restart: "unless-stopped"
+  sonarr:
+    image: hotio/sonarr
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Vancouver
+      - UMASK_SET=022
+    volumes:
+      - /mnt/jellydata/apps/sonarr:/config
+      - /mnt/jellydata/data:/data
+    ports:
+      - 8989:8989
+    restart: "unless-stopped"
+  radarr:
+    image: hotio/radarr
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Vancouver
+      - UMASK_SET=022
+    volumes:
+      - /mnt/jellydata/apps/radarr:/config
+      - /mnt/jellydata/data:/data
+    ports:
+      - 7878:7878
+    restart: "unless-stopped"
