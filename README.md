@@ -25,6 +25,8 @@ The drive that is used by the media server should have the following structure:
 ```
 /apps/
   qbittorrent/
+    wireguard/
+      wg0.conf
   sonarr/
   radarr/
   jellyfin/
@@ -34,3 +36,5 @@ The drive that is used by the media server should have the following structure:
     tvshows/
   torrent/
 ```
+
+A wireguard dir and config file must be present in the qbittorrent directory to ensure that a vpn is used.

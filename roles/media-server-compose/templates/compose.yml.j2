@@ -35,6 +35,12 @@ services:
       - TZ=America/Vancouver
       - UMASK_SET=022
       #- WEBUI_PORT=8080
+      - VPN_ENABLED=true
+      - VPN_LAN_NETWORK=192.168.68.0/24
+      - VPN_CONF=wg0
+      - VPN_ADDITIONAL_PORTS
+      - VPN_IP_CHECK_DELAY=5
+      - PRIVOXY_ENABLED=false
     volumes:
       - /mnt/jellydata/apps/qbittorrent:/config
       - /mnt/jellydata/data/torrent:/data/torrent
@@ -42,6 +48,11 @@ services:
       - "8080:8080" # web UI port
       #- "6881:6881" # tcp connection port
       #- "6881:6881/udp" # udp connection port
+    cap_add:
+       - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=1
     restart: "unless-stopped"
   sonarr:
     image: hotio/sonarr
