@@ -1,12 +1,24 @@
 - hosts: all
   roles:
     - common
-    - docker
+
+- hosts: nas
+  tasks:
+    - name: Install mesa GPU drivers
+      package:
+        name: mesa-va-drivers # AMD GPU drivers # other option is amdgpu-pro
+        state: present
+      become: yes
+  roles:
+    - zfs
+    - lxc
 
 - hosts: pihole
   roles:
+    - docker
     - pihole-compose
 
 - hosts: pi
   roles:
+    - docker
     - media-server-compose

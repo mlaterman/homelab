@@ -1,0 +1,3 @@
+- name: autostart virsh
+  command: virsh net-autostart default
+  become: yes

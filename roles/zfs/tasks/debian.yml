@@ -1,0 +1,24 @@
+- name: Add backports source
+  apt_repository:
+    repo: "deb http://deb.debian.org/debian {{ ansible_distribution_release | lower }}-backports main contrib non-free"
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Install prereqs
+  apt:
+    update_cache: yes
+    name:
+      - lsb-release
+      - linux-headers-{{ ansible_kernel }}
+    state: present
+  become: yes
+
+- name: Install ZFS
+  apt:
+    name:
+      - zfsutils-linux
+      - zfs-dkms
+    state: present
+    default_release: "{{ ansible_distribution_release | lower }}-backports"
+  become: yes

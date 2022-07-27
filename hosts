@@ -9,3 +9,8 @@ ansible_user=ubuntu
 
 [pihole:vars]
 ansible_user=pi
+
+[nas]
+192.168.68.123
+
+[nas:vars]

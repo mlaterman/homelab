@@ -1,0 +1,81 @@
+- name: Install LXC
+  package:
+    name:
+      - lxc
+      - debootstrap
+      - bridge-utils
+     #- libvirt-bin
+      - libvirt0
+      - libpam-cgfs
+      - bridge-utils
+      - uidmap
+    state: present
+  become: yes
+
+- name: Install packages for host-bridge
+  package:
+    name:
+      - libvirt-clients
+      - libvirt-daemon-system
+      - iptables
+      - ebtables
+      - dnsmasq-base
+      - libxml2-utils
+      - iproute2
+    state: present
+  become: yes
+
+- name: Copy default config
+  copy:
+    src: default.conf
+    dest: /etc/lxc/default.conf
+    mode: 0644
+  become: yes
+
+- name: Start default network
+  command: virsh net-start default
+  notify: autostart virsh
+  register: virsh
+  failed_when:
+    - virsh.rc != 0
+    - '"network is already active" not in virsh.stderr'
+  changed_when: virsh == 0
+  become: yes
+
+- name: LXC user networking
+  template:
+    src: lxc-usernet.j2
+    dest: /etc/lxc/lxc-usernet
+    mode: 0644
+  become: yes
+
+- name: Create user config dir
+  file:
+    path: "{{ lookup('env', 'HOME') }}/.config/lxc"
+    state: directory
+  become: yes
+
+- name: get user sub uid and gid
+  block:
+    - shell: "grep {{ ansible_user }} /etc/subuid  | cut -d : -f 2"
+      register: sh_ms_uid
+      changed_when: False
+    - shell: "grep {{ ansible_user }} /etc/subuid  | cut -d : -f 3"
+      register: sh_me_uid
+      changed_when: False
+    - shell: "grep {{ ansible_user }} /etc/subgid  | cut -d : -f 2"
+      register: sh_ms_gid
+      changed_when: False
+    - shell: "grep {{ ansible_user }} /etc/subgid  | cut -d : -f 3"
+      register: sh_me_gid
+      changed_when: False
+
+- name: Template user config
+  template:
+    src: default.conf.j2
+    dest: "{{ lookup('env', 'HOME') }}/.config/lxc/default.conf"
+  become: yes
+
+- name: Allow lingering sessions
+  command: loginctl enable-linger {{ ansible_user }}
+  become: yes

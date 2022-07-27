@@ -8,6 +8,10 @@
     - restart sshd
   become: yes
 
+- name: Disable root login
+  command: passwd -l root
+  become: yes
+
 - name: Enable ssh strict mode
   lineinfile:
     dest: "{{ ssh_sshd_config }}"
@@ -47,4 +51,8 @@
     - restart sshd
   become: yes
 
-
+- name: Install wireguard
+  package:
+    name: wireguard
+    state: present
+  become: yes

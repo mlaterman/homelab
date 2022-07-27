@@ -13,7 +13,7 @@ services:
       # Optional - alternative address used for autodiscovery
       #- JELLYFIN_PublishedServerUrl=http://example.com
     volumes:
-      - /mnt/jellydata/apps/jellyfin:/config
+      - /opt/jellyfin:/config
       - /mnt/jellydata/data/media:/data/media
     devices:
       - /dev/vchiq:/dev/vchiq
@@ -42,7 +42,7 @@ services:
       - VPN_IP_CHECK_DELAY=5
       - PRIVOXY_ENABLED=false
     volumes:
-      - /mnt/jellydata/apps/qbittorrent:/config
+      - /opt/qbittorrent:/config
       - /mnt/jellydata/data/torrent:/data/torrent
     ports:
       - "8080:8080" # web UI port
@@ -63,7 +63,7 @@ services:
       - TZ=America/Vancouver
       - UMASK_SET=022
     volumes:
-      - /mnt/jellydata/apps/sonarr:/config
+      - /opt/sonarr:/config
       - /mnt/jellydata/data:/data
     ports:
       - 8989:8989
@@ -77,8 +77,35 @@ services:
       - TZ=America/Vancouver
       - UMASK_SET=022
     volumes:
-      - /mnt/jellydata/apps/radarr:/config
+      - /opt/radarr:/config
       - /mnt/jellydata/data:/data
     ports:
       - 7878:7878
     restart: "unless-stopped"
+  bazarr:
+    image: cr.hotio.dev/hotio/bazarr
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Vancouver
+      - UMASK_SET=022
+    volumes:
+      - /opt/bazarr:/config
+      - /mnt/jellydata/data:/data
+    ports:
+      - 6767:6767
+    restart: "unless-stopped"
+  jackett:
+    image: cr.hotio.dev/hotio/jackett
+    container_name: jackett
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Vancouver
+      - UMASK=022
+    ports:
+      - 9117:9117
+    volumes:
+      - /opt/jackett:/config
+      - /mnt/jellydata/data:/data
