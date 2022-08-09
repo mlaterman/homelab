@@ -1,0 +1,39 @@
+- name: Check if jackett is installed
+  stat:
+    path: /opt/Jackett/jackett
+  register: stat_jackett
+
+- name: Create jackett user
+  user:
+    name: jackett
+    group: media
+    system: yes
+    shell: /sbin/nologin
+    state: present
+  become: yes
+
+- name: Download jackett
+  get_url:
+    url: https://github.com/Jackett/Jackett/releases/download/{{ jackett_version }}/Jackett.Binaries.LinuxAMDx64.tar.gz
+    dest: /tmp/jackett-{{ jackett_version }}.tar.gz
+  when: not stat_jackett.stat.exists
+
+- name: Unarchive jackett
+  unarchive:
+    src: /tmp/jackett-{{ jackett_version }}.tar.gz
+    remote_src: yes
+    dest: /opt/
+    owner: jackett
+    group: media
+    creates: /opt/Jackett/jackett
+  become: yes
+  when: not stat_jackett.stat.exists
+  notify: start jackett
+
+- name: Create jackett service file
+  template:
+    src: jackett.service.j2
+    dest: /etc/systemd/system/jackett.service
+    mode: 0666
+  become: yes
+  notify: start jackett

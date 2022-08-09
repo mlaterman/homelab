@@ -1,0 +1,56 @@
+- name: Check if radarr is installed
+  stat:
+    path: /opt/Radarr/Radarr
+  register: stat_radarr
+
+- name: Create radarr user
+  user:
+    name: radarr
+    group: media
+    system: yes
+    shell: /sbin/nologin
+    state: present
+  become: yes
+
+- name: Create directories
+  file:
+    path: /var/lib/radarr
+    owner: radarr
+    group: media
+    state: directory
+  become: yes
+
+- name: Install prereqs
+  package:
+    name:
+      - curl
+      - sqlite3
+    state: present
+  become: yes
+
+  # TODO support arm or arm64
+- name: Get radarr
+  get_url:
+    url: http://radarr.servarr.com/v1/update/master/updatefile?os=linux&runtime=netcore&arch=x64&version={{ radarr_version }}
+    dest: /tmp/radarr.master.{{ radarr_version }}.linux.tar.gz
+  when: not stat_radarr.stat.exists
+
+- name: Unarchive radarr
+  unarchive:
+    src: /tmp/radarr.master.{{ radarr_version }}.linux.tar.gz
+    remote_src: yes
+    owner: radarr
+    group: media
+    dest: /opt/
+    creates: /opt/Radarr/Radarr
+  become: yes
+  when: not stat_radarr.stat.exists
+  notify: start radarr
+
+- name: Template radarr
+  template:
+    src: radarr.service.j2
+    dest: /etc/systemd/system/radarr.service
+    mode: 0666
+  become: yes
+  notify: start radarr

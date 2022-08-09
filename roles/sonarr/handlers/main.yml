@@ -1,0 +1,6 @@
+- name: start sonarr
+  service:
+    name: sonarr
+    state: restarted
+    enabled: yes
+  become: yes

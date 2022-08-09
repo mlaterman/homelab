@@ -1,0 +1,14 @@
+[Unit]
+Description=Bazarr subtitle manager
+After=network.target
+
+[Service]
+Type=simple
+User=bazarr
+Group=media
+WorkingDirectory=/opt/bazarr
+ExecStart=/opt/bazarr/venv/bin/python3 /opt/bazarr/bazarr.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

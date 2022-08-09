@@ -1,0 +1,13 @@
+- name: wg0-up
+  service:
+    name: wg-quick@wg0
+    state: started
+    enabled: yes
+  become: yes
+
+- name: start qbittorrent-nox
+  service:
+    name: qbittorrent-nox
+    state: started
+    enabled: yes
+  become: yes

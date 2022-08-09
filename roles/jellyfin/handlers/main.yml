@@ -1,0 +1,6 @@
+- name: start jellyfin
+  service:
+    name: jellyfin
+    state: started
+    enabled: yes
+  become: yes

@@ -2,23 +2,18 @@
   roles:
     - common
 
-- hosts: nas
-  tasks:
-    - name: Install mesa GPU drivers
-      package:
-        name: mesa-va-drivers # AMD GPU drivers # other option is amdgpu-pro
-        state: present
-      become: yes
-  roles:
-    - zfs
-    - lxc
-
 - hosts: pihole
   roles:
     - docker
     - pihole-compose
 
 - hosts: pi
+    - name: Install wireguard
+      package:
+        name: wireguard
+        state: present
+      become: yes
+  roles:
   roles:
     - docker
     - media-server-compose

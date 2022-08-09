@@ -1,0 +1,32 @@
+- name: Install extrepo
+  package:
+    name: extrepo
+    state: present
+  become: yes
+
+- name: Enable jellyfin repo
+  command: extrepo enable jellyfin
+  args:
+    creates: /etc/apt/sources.list.d/extrepo_jellyfin.sources
+  become: yes
+
+- name: Install jellyfin
+  package:
+    name: jellyfin
+    state: present
+  become: yes
+  notify: start jellyfin
+
+- name: Add jellyfin user to media group
+  user:
+    name: jellyfin
+    groups: media
+    append: yes
+  become: yes
+
+- name: Add jellyfin user to render group
+  user:
+    name: jellyfin
+    groups: render
+    append: yes
+  become: yes

@@ -1,0 +1,47 @@
+- name: Install wireguard
+  package:
+    name:
+      - wireguard
+      - openresolv
+    state: present
+  become: yes
+
+- name: Copy wireguard conf
+  template:
+    source: wg0.conf.j2
+    dest: /etc/wireguard/wg0.conf
+    mode: 0666
+  become: yes
+  notify: wg0-up
+
+- name: Create qbittorrent group
+  group:
+    name: "{{ qbittorrent_group }}"
+    system: yes
+    state: present
+  become: yes
+
+- name: Create qbittorrent user
+  user:
+    name: "{{ qbittorrent_user }}"
+    group: "{{ qbittorrent_group }}"
+    groups: media
+    system: yes
+    shell: /sbin/nologin
+    append: yes
+    state: present
+  become: yes
+
+- name: Install qbittorrent-nox
+  package:
+    name: qbittorrent-nox
+    state: present
+  become: yes
+
+- name: Template qbittorrent-nox systemd service file
+  template:
+    source: qbittorrent-nox.service.j2
+    dest: /etc/systemd/system/qbittorrent-nox.service
+    mode: 0666
+  become: yes
+  notify: start qbittorrent-nox

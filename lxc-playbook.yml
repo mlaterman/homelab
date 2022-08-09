@@ -1,0 +1,30 @@
+- hosts: all
+  tasks:
+    - name: Create media group
+      group:
+        name: media
+        gid: 1000
+        state: present
+        system: yes
+      become: yes
+
+- hosts: jellyfin
+  tasks:
+    - name: Install mesa GPU drivers
+      package:
+        name: mesa-va-drivers
+        state: present
+      become: yes
+  roles:
+    - jellyfin
+
+- hosts: qbittorrent
+  roles:
+    - qbittorrent
+
+- hosts: arr
+  roles:
+    - sonarr
+    - radarr
+    - bazarr
+    - jackett

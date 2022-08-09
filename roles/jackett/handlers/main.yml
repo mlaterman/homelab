@@ -1,0 +1,6 @@
+- name: start jackett
+  service:
+    name: jackett.service
+    state: started
+    enabled: yes
+  become: yes

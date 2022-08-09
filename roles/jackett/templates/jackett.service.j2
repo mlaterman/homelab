@@ -1,0 +1,17 @@
+[Unit]
+Description=Jackett index manager
+After=netowrk.target
+
+[Service]
+SyslogIdentifier=jackett
+Restart=always
+RestartSec=5
+Type=simple
+User=jackett
+Group=media
+WorkingDirectory=/opt/Jackett
+ExecStart=/bin/sh /opt/Jackett/jackett_launcher.sh
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

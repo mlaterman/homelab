@@ -4,3 +4,10 @@
     state: restarted
     enabled: yes
   become: yes
+
+- name: start unattended-upgrades
+  service:
+    name: unattended-upgrades
+    state: started
+    enabled: yes
+  become: yes

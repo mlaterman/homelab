@@ -1,0 +1,6 @@
+- name: start radarr
+  service:
+    name: radarr.service
+    state: started
+    enabled: yes
+  become: yes

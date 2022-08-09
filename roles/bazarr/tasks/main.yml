@@ -1,0 +1,74 @@
+- name: Check if bazarr is installed
+  stat:
+    path: /opt/bazarr/bazarr.py
+  register: stat_bazarr
+
+- name: Create bazarr user
+  user:
+    name: bazarr
+    group: media
+    system: yes
+    shell: /sbin/nologin
+    state: present
+  become: yes
+
+- name: Install prereqs
+  package:
+    name:
+      - unzip
+      - python3-dev
+      - python3-pip
+      - python3-distutils
+      - python3-venv
+    state: present
+  become: yes
+
+- name: Download bazarr
+  get_url:
+    url: https://github.com/morpheus65535/bazarr/releases/latest/download/bazarr.zip
+    dest: /tmp/bazarr.zip
+  when: not stat_bazarr.stat.exists
+
+- name: Create directories
+  file:
+    path: /opt/bazarr
+    owner: bazarr
+    group: media
+    state: directory
+  become: yes
+
+- name: Unarchive bazarr
+  unarchive:
+    src: /tmp/bazarr.zip
+    remote_src: yes
+    dest: /opt/bazarr
+    owner: bazarr
+    group: media
+    creates: /opt/bazarr/bazarr.py
+  become: yes
+  when: not stat_bazarr.stat.exists
+  notify: start bazarr
+
+- name: create virtual env for bazarr
+  pip:
+    name: ['pip', 'setuptools']
+    state: latest
+    virtualenv: /opt/bazarr/venv
+    virtualenv_command: /usr/bin/python3 -m venv
+  become: yes
+  become_user: bazarr
+
+- name: install bazarr reqs
+  pip:
+    requirements: /opt/bazarr/requirements.txt
+    virtualenv: /opt/bazarr/venv
+  become: yes
+  become_user: bazarr
+
+- name: create bazarr service file
+  template:
+    src: bazarr.service.j2
+    dest: /etc/systemd/system/bazarr.service
+    mode: 0666
+  become: yes
+  notify: start bazarr
