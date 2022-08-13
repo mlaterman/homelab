@@ -1,0 +1,8 @@
+cf_ddns_user: cf-ddns
+cf_ddns_group: cf-ddns
+
+cf_ddns_email:
+cf_ddns_method: token
+cf_ddns_key:
+cf_ddns_zone:
+cf_ddns_record:

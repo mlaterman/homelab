@@ -1,4 +1,4 @@
-- hosts: all
+- hosts: all,!nginx
   tasks:
     - name: Create media group
       group:
@@ -28,3 +28,16 @@
     - radarr
     - bazarr
     - jackett
+
+- hosts: nginx
+  vars:
+    nginx_domain: "{{ domain }}"
+    nginx_cf_token: "{{ cloudflare_token }}"
+    nginx_certbot_email: "{{ email }}"
+    cf_ddns_email: "{{ email }}"
+    cf_ddns_key: "{{ cloudflare_token }}"
+    cf_ddns_zone: "{{ cloudflare_zone }}"
+    cf_ddns_record: "{{ domain }}"
+  roles:
+    - cf-ddns
+    - nginx

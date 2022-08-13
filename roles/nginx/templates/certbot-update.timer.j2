@@ -1,0 +1,10 @@
+[Unit]
+Description=Certbot update timer
+Requires=certbot-update.service
+
+[Timer]
+Unit=certbot-update.service
+OnCalendar=monthly
+
+[Install]
+WantedBy=timers.target

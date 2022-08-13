@@ -1,0 +1,13 @@
+- name: start ddns
+  service:
+    name: cf-ddns.service
+    state: started
+    enabled: yes
+  become: yes
+
+- name: start ddns timer
+  service:
+    name: cf-ddns.timer
+    state: started
+    enabled: yes
+  become: yes

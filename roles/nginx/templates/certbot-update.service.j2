@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Certbot update
+After=network.target
+Wants=certbot-update.timer
+
+[Service]
+Type=oneshot
+ExecStart=/opt/certbot/bin/pip install --upgrade certbot certbot-nginx certbot-dns-cloudflare
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
+

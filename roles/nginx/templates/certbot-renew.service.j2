@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Certbot certificate renewal
+After=network.target
+Wants=certbot-renew.timer
+
+[Service]
+Type=oneshot
+ExecStart=/opt/certbot/bin/certbot renew -q
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

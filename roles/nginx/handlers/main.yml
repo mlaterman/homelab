@@ -1,0 +1,39 @@
+- name: start nginx
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+  become: yes
+
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded
+    enabled: yes
+  become: yes
+
+- name: enable certbot renew
+  service:
+    name: certbot-renew.service
+    enabled: yes
+  become: yes
+
+- name: start certbot renew timer
+  service:
+    name: certbot-renew.timer
+    state: started
+    enabled: yes
+  become: yes
+
+- name: enable certbot update
+  service:
+    name: certbot-update.service
+    enabled: yes
+  become: yes
+
+- name: start certbot update timer
+  service:
+    name: certbot-update.timer
+    state: started
+    enabled: yes
+  become: yes

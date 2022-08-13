@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+[Unit]
+Description=CloudFlare DDNS registration script
+After=network.target
+Wants=cf-ddns.timer
+
+[Service]
+Type=oneshot
+ExecStart=/home/{{ cf_ddns_user }}/bin/cloudflare.sh
+User={{ cf_ddns_user }}
+Group={{ cf_ddns_group }}
+
+[Install]
+WantedBy=multi-user.target

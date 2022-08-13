@@ -52,6 +52,11 @@ zfs create tank/jellydata
 mkdir -p /tank/jellydata/media/tv
 mkdir -p /tank/jellydata/media/movies
 mkdir -p /tank/jellydata/download/torrent
+# set jellydata owner
+# you may have to set directory owners on proxmox after containers are running to get everything working as expected
+# i.e.  download/torrent should be owned by qbittorrent
+#       media/* must be owned by media group
+chmod -R 100107:101000 /tank/jellydata
 
 # scrub zpool weekly
 systemctl enable zfs-scrub-weekly@tank.timer --now
@@ -62,6 +67,8 @@ apt install wireguard
 # Install AMD GPU drivers on host to allow containers to install and use
 apt install mesa-va-drivers
 ```
+
+Note a domain registed through cloudflare is needed for the nginx container.
 
 The proxmox playbook will run on LXC containers hosted on a proxmox host. The current list is:
 
@@ -74,6 +81,10 @@ The proxmox playbook will run on LXC containers hosted on a proxmox host. The cu
   - radarr - manually installed
   - bazarr - installed through python3 virtual env
   - jackett - manually installed
+- nginx - debian 11
+  - nginx - installed as a package
+  - certbot - installed through pip (python3)
+  - DDNS script - cloudflare dynamic DNS script (bash)
 
 The following setup steps are to be done on the host OS in addition to running the `lxc-playbook.yml` targetting the containers:
 
@@ -109,9 +120,8 @@ To mount a zfs filesystem as a bind-mount to an LXC container (ID 102):
 pct set 102 -mp0 /tank/jellydata/,mp=/jellydata
 ```
 
-## TODO
+### nginx setup
 
-- uid/gid mapping for containers
-- reverse proxy to simplicy access to services (and only have a couple exposed to the internet?)
-  - dynamic dns
-  - https certs
+Get the zone for the cloudflare domain, and a token with permissions to edit the domain (zone).
+forward TCP ports 80/443 to the nginx LXC.
+

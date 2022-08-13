@@ -1,0 +1,103 @@
+- name: Install nginx
+  package:
+    name: nginx
+    state: present
+  become: yes
+  notify: start nginx
+
+- name: Install certbot prereqs
+  package:
+    name:
+      - python3
+      - python3-pip
+      - python3-venv
+      - libaugeas0
+    state: present
+  become: yes
+
+- name: Create certbot venv
+  pip:
+    name: ['pip', 'setuptools']
+    state: latest
+    virtualenv: /opt/certbot
+    virtualenv_command: /usr/bin/python3 -m venv
+  become: yes
+
+- name: Install certbot
+  pip:
+    name:
+      - certbot
+      - certbot-nginx
+      - certbot-dns-cloudflare
+    state: present
+    virtualenv: /opt/certbot
+  become: yes
+
+- name: Link certbot
+  file:
+    src: /opt/certbot/bin/certbot
+    dest: /usr/bin/certbot
+    state: link
+  become: yes
+
+- name: Create certbot cloudflare config file
+  template:
+    src: credentials.ini.j2
+    dest: /root/credentials.ini
+    mode: 0600
+  become: yes
+
+- name: Generate certificates
+  command: /opt/certbot/bin/certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/credentials.ini -d {{ nginx_domain }} -d "*.{{ nginx_domain }}" -i nginx --email "{{ nginx_certbot_email }}" --agree-tos -n
+  args:
+    creates: /etc/letsencrypt/live/{{ nginx_domain }}/privkey.pem
+  become: yes
+
+- name: Create certbot cert update service
+  template:
+    src: certbot-renew.service.j2
+    dest: /etc/systemd/system/certbot-renew.service
+  become: yes
+  notify: enable certbot renew
+
+- name: Create certbot cert update timer
+  template:
+    src: certbot-renew.timer.j2
+    dest: /etc/systemd/system/certbot-renew.timer
+  become: yes
+  notify: start certbot renew timer
+
+- name: create certbot binary update service
+  template:
+    src: certbot-update.service.j2
+    dest: /etc/systemd/system/certbot-update.service
+  become: yes
+  notify: enable certbot update
+
+- name: create certbot binary update timer
+  template:
+    src: certbot-update.timer.j2
+    dest: /etc/systemd/system/certbot-update.timer
+  become: yes
+  notify: start certbot update timer
+
+- name: remove default site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  become: yes
+
+- name: add new nginx default config
+  template:
+    src: nginx-default.j2
+    dest: /etc/nginx/sites-available/nginx-default
+    mode: 0644
+  become: yes
+
+- name: link nginx default
+  file:
+    src: /etc/nginx/sites-available/nginx-default
+    dest: /etc/nginx/sites-enabled/default
+    state: link
+  become: yes
+  notify: reload nginx

@@ -1,0 +1,10 @@
+[Unit]
+Description=CloudFlare DDNS timer
+Requires=cf-ddns.service
+
+[Timer]
+Unit=cf-ddns.service
+OnCalendar=daily
+
+[Install]
+WantedBy=timers.target

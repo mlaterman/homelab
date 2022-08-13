@@ -1,0 +1,12 @@
+[Unit]
+Description=Certbot certificate renewal timer
+Requires=certbot-renew.service
+
+[Timer]
+Unit=certbot-renew.service
+OnCalendar=daily
+RandomizedDelaySec=5m
+
+[Install]
+WantedBy=timers.target
+
