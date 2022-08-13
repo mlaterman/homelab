@@ -101,3 +101,33 @@
     state: link
   become: yes
   notify: reload nginx
+
+- name: add vtt proxy config
+  template:
+    src: vtt.j2
+    dest: /etc/nginx/sites-available/vtt
+    mode: 0644
+  become: yes
+
+- name: link vtt proxy config
+  file:
+    src: /etc/nginx/sites-available/vtt
+    dest: /etc/nginx/sites-enabled/vtt
+    state: link
+  become: yes
+  notify: reload nginx
+
+- name: add city proxy config
+  template:
+    src: city.j2
+    dest: /etc/nginx/sites-available/city
+    mode: 0644
+  become: yes
+
+- name: link city proxy config
+  file:
+    src: /etc/nginx/sites-available/city
+    dest: /etc/nginx/sites-enabled/city
+    state: link
+  become: yes
+  notify: reload nginx

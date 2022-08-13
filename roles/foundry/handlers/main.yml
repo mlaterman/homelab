@@ -1,0 +1,6 @@
+- name: restart foundry
+  service:
+    name: foundryvtt.service
+    enabled: yes
+    state: restarted
+  become: yes

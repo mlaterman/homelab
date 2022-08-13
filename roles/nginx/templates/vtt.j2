@@ -1,0 +1,29 @@
+# {{ ansible_managed }}
+
+server {
+	listen		443 ssl;
+	server_name	vtt.{{ nginx_domain }};
+
+	ssl_certificate		/etc/letsencrypt/live/{{ nginx_domain }}/fullchain.pem;
+	ssl_certificate_key	/etc/letsencrypt/live/{{ nginx_domain }}/privkey.pem;
+	include			/etc/letsencrypt/options-ssl-nginx.conf;
+	ssl_dhparam		/etc/letsencrypt/ssl-dhparams.pem;
+
+	# Sets the Max Upload size to 300 MB
+	client_max_body_size 300M;
+
+	# Proxy Requests to Foundry VTT
+	location / {
+		# Set proxy headers
+		proxy_set_header Host $host;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+
+		# These are important to support WebSockets
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection "Upgrade";
+
+		# Make sure to set your Foundry VTT port number
+		proxy_pass http://{{ hostvars[groups['vtt'][0]].inventory_hostname }}:30000;
+	}
+}

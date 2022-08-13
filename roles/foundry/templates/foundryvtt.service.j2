@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Foundry VTT
+Documentation=https://foundryvtt.com/kb/
+After=network-online.target
+
+[Service]
+Type=simple
+Restart=always
+User={{ foundry_user }}
+Group={{ foundry_group }}
+EnvironmentFile=/data/adminKey
+ExecStart=/usr/bin/node {{ foundry_dir }}/resources/app/main.js --dataPath=/data/FoundryVTT $FOUNDRY_ADMIN
+
+[Install]
+WantedBy=multi-user.target

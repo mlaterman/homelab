@@ -56,7 +56,14 @@ mkdir -p /tank/jellydata/download/torrent
 # you may have to set directory owners on proxmox after containers are running to get everything working as expected
 # i.e.  download/torrent should be owned by qbittorrent
 #       media/* must be owned by media group
-chmod -R 100107:101000 /tank/jellydata
+chmod -R 100000:101000 /tank/jellydata
+
+# create vtt data storage dir
+zfs create tank/vtt
+chown -R 100000:100000 /tank/vtt/
+
+zfs create tank/city
+chown -R 100000:100000 /tank/city/
 
 # scrub zpool weekly
 systemctl enable zfs-scrub-weekly@tank.timer --now
@@ -85,6 +92,8 @@ The proxmox playbook will run on LXC containers hosted on a proxmox host. The cu
   - nginx - installed as a package
   - certbot - installed through pip (python3)
   - DDNS script - cloudflare dynamic DNS script (bash)
+- vtt/city - debian 11
+  - FoundryVTT running on node 14 LTS
 
 The following setup steps are to be done on the host OS in addition to running the `lxc-playbook.yml` targetting the containers:
 
@@ -125,3 +134,11 @@ pct set 102 -mp0 /tank/jellydata/,mp=/jellydata
 Get the zone for the cloudflare domain, and a token with permissions to edit the domain (zone).
 forward TCP ports 80/443 to the nginx LXC.
 
+### vtt/city setup
+
+To mount a zfs filesystem as a bind-mount to an LXC container (ID 104, 105):
+
+```sh
+pct set 104 -mp0 /tank/vtt/,mp=/data
+pct set 105 -mp0 /tank/city/,mp=/data
+```

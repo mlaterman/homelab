@@ -1,17 +1,17 @@
 [jellyfin]
-192.168.8.115
+192.168.4.28
 
 [jellyfin:vars]
 ansible_user=root
 
 [qbittorrent]
-192.168.8.118
+192.168.4.29
 
 [qbittorrent:vars]
 ansible_user=root
 
 [arr]
-192.168.8.119
+192.168.4.31
 
 [arr:vars]
 ansible_user=root
@@ -20,4 +20,16 @@ ansible_user=root
 192.168.4.34
 
 [nginx:vars]
+ansible_user=root
+
+[vtt]
+192.168.4.36
+
+[vtt:vars]
+ansible_user=root
+
+[city]
+192.168.4.37
+
+[city:vars]
 ansible_user=root

@@ -1,0 +1,130 @@
+- name: create foundry group
+  group:
+    name: "{{ foundry_group }}"
+    system: yes
+    state: present
+  become: yes
+
+- name: create foundry user
+  user:
+    name: "{{ foundry_user }}"
+    groups: "{{ foundry_group }}"
+    system: yes
+    shell: /bin/nologin
+    state: present
+  become: yes
+
+- name: create foundry dir
+  file:
+    path: "{{ foundry_dir }}"
+    state: directory
+    owner: "{{ foundry_user }}"
+    group: "{{ foundry_group }}"
+    mode: 0755
+  become: yes
+
+- name: create fallback data dir
+  file:
+    path: /home/foundry/.local/share/FoundryVTT
+    state: directory
+    owner: "{{ foundry_user }}"
+    group: "{{ foundry_group }}"
+    mode: 0755
+    recurse: yes
+  become: yes
+
+- name: Install prereqs
+  package:
+    name: gnupg
+    state: present
+  become: yes
+
+- name: Add NodeSource key
+  apt_key:
+    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    state: present
+  become: yes
+
+- name: Add Nodejs 14.x (lts) repo
+  apt_repository:
+    repo: deb https://deb.nodesource.com/node_14.x {{ ansible_distribution_release }} main
+    state: present
+  become: yes
+
+- name: install requirements
+  package:
+    name:
+      - unzip
+      - libssl-dev
+      - nodejs
+    state: latest
+  become: yes
+
+- name: unarchive foundry
+  unarchive:
+    src: "{{ foundry_download_url }}"
+    remote_src: yes
+    dest: "{{ foundry_dir }}"
+    owner: "{{ foundry_user }}"
+    group: "{{ foundry_group }}"
+    mode: 0755
+    creates: "{{ foundry_dir }}/resources/app/main.js"
+  become: yes
+
+- name: create foundry data dir
+  file:
+    path: "/data/FoundryVTT"
+    state: directory
+    owner: "{{ foundry_user }}"
+    group: "{{ foundry_group }}"
+    mode: 0755
+  become: yes
+
+- name: create foundry user config dir
+  file:
+    path: "/data/FoundryVTT/Config"
+    state: directory
+    owner: "{{ foundry_user }}"
+    group: "{{ foundry_group }}"
+    mode: 0755
+  become: yes
+
+- name: create foundry config
+  template:
+    src: options.json.j2
+    dest: "/data/FoundryVTT/Config/options.json"
+    owner: "{{ foundry_user }}"
+    group: "{{ foundry_group }}"
+    mode: 0644
+  become: yes
+  notify: restart foundry
+
+- name: copy admin key to server
+  template:
+    src: adminKey.j2
+    dest: "/data/adminKey"
+    owner: "{{ foundry_user }}"
+    group: "{{ foundry_group }}"
+    mode: 0600
+  become: yes
+  notify: restart foundry
+
+- name: copy service file
+  template:
+    src: foundryvtt.service.j2
+    dest: /etc/systemd/system/foundryvtt.service
+  become: yes
+  notify: restart foundry
+
+- name: ensure logrotate is installed
+  package:
+    name: logrotate
+    state: present
+  become: yes
+
+- name: configure foundry log rotation
+  template:
+    src: logrotate.j2
+    dest: /etc/logrotate.d/foundryvtt
+    mode: 0644
+  become: yes
