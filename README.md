@@ -72,7 +72,7 @@ systemctl enable zfs-scrub-weekly@tank.timer --now
 apt install wireguard
 
 # Install AMD GPU drivers on host to allow containers to install and use
-apt install mesa-va-drivers vainfo
+apt install mesa-va-drivers vainfo mesa-vdpau-drivers # not sure if mesa-vdpau-drivers is needed
 ```
 
 Note a domain registed through cloudflare is needed for the nginx container.
