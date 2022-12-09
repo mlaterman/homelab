@@ -72,7 +72,7 @@ systemctl enable zfs-scrub-weekly@tank.timer --now
 apt install wireguard
 
 # Install AMD GPU drivers on host to allow containers to install and use
-apt install mesa-va-drivers
+apt install mesa-va-drivers vainfo
 ```
 
 Note a domain registed through cloudflare is needed for the nginx container.
@@ -108,10 +108,40 @@ pct set 100 -mp0 /tank/jellydata/media,mp=/jellydata/media
 Then add the gpu device to the config. i.e.:
 ```sh
 vi /etc/pve/lxc/100.conf
-lxc.cgroup.devices.allow: c 226:* rwm
+lxc.cgroup2.devices.allow: c 226:* rwm
 lxc.mount.entry: /dev/dri/card0 dev/dri/card0 none bind,optional,create=file
 lxc.mount.entry: /dev/dri/renderD128 dev/dri/renderD128 none bind,optional,create=file
 ```
+
+In order to properly use a video card to transcode, find the render group ID in both the host and the container.
+In the host:
+```sh
+root@proxmox:~# getent group | grep render
+render:x:103:
+```
+
+Container:
+```sh
+root@jellyfin:~# getent group | grep render
+render:x:105
+```
+
+Then on the host add the following to `/etc/subgid` to allow LXC containers to map the host's render group:
+```
+root:103:1
+```
+
+And add the following to the configuration for the container:
+```sh
+vi /etc/pve/lxc/100.conf
+lxc.idmap: u 0 100000 65536
+lxc.idmap: g 0 100000 105
+lxc.idmap: g 105 103 1
+lxc.idmap: g 106 100106 65430
+```
+
+This will map the host render group to the container render group.
+This allows the container to use the video card for transcoding.
 
 ### qbittorrent setup
 
