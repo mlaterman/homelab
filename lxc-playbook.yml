@@ -1,4 +1,4 @@
-- hosts: all,!nginx,!vtt
+- hosts: jellyfin,qbittorrent,arr,nzbget
   tasks:
     - name: Create media group
       group:
@@ -41,6 +41,16 @@
   roles:
     - cf-ddns
     - nginx
+
+- hosts: nzbget
+  vars:
+    nzbget_server_name: "{{ usenet_server_name }}"
+    nzbget_server_host: "{{ usenet_server_host }}"
+    nzbget_server_port: "{{ usenet_server_port }}"
+    nzbget_server_user: "{{ usenet_username }}"
+    nzbget_server_pass: "{{ usenet_password }}"
+  roles:
+    - nzbget
 
 - hosts: vtt
   vars:

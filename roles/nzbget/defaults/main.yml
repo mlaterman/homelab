@@ -1,0 +1,8 @@
+nzbget_user: nzbget
+nzbget_group: nzbget
+nzbget_main_dir: /jellydata/download/usenet
+nzbget_server_name:
+nzbget_server_host:
+nzbget_server_port: 563
+nzbget_server_user:
+nzbget_server_pass:

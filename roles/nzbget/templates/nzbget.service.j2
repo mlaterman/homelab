@@ -1,0 +1,15 @@
+[Unit]
+Description=nzbget server
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/opt/nzbget/nzbget -c /opt/nzbget/nzbget.conf -D
+ExecStop=/opt/nzbget/nzbget -Q
+ExecReload=/opt/nzbget/nzbget -c /opt/nzbget/nzbget.conf -O
+Restart=on-failure
+User={{ nzbget_user }}
+Group=media
+
+[Install]
+WantedBy=multi-user.target

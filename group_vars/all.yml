@@ -2,3 +2,8 @@ domain:
 email:
 cloudflare_token:
 cloudflare_zone:
+usenet_server_name:
+usenet_server_host:
+usenet_server_port:
+usenet_username:
+usenet_password:

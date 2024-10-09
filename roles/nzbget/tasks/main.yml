@@ -1,0 +1,114 @@
+- name: Create nzbget group
+  group:
+    name: "{{ nzbget_group }}"
+    system: yes
+    state: present
+  become: yes
+
+- name: Create nzbget user
+  user:
+    name: "{{ nzbget_user }}"
+    group: media
+    groups: "{{ nzbget_group }}"
+    system: yes
+    shell: /sbin/nologin
+    append: yes
+    state: present
+  become: yes
+
+- name: Check if nzbget is installed
+  stat:
+    path: /opt/nzbget/nzbget
+  register: stat_nzbget
+
+- name: Download nzbget
+  get_url:
+    url: https://nzbget.com/download/nzbget-latest-bin-linux.run
+    dest: /tmp/nzbget-latest-bin-linux.run
+    mode: 0755
+  when: not stat_nzbget.stat.exists
+
+- name: Install nzbget
+  command:
+    cmd: /tmp/nzbget-latest-bin-linux.run --destdir /opt/nzbget
+    creates: /opt/nzbget
+  become: yes
+  notify: start nzbget
+
+- name: Remove downloaded file
+  file:
+    path: /tmp/nzbget-latest-bin-linux.run
+    state: absent
+  become: yes
+
+- name: Create log dir
+  file:
+    path: /opt/nzbget/log
+    state: directory
+    owner: "{{ nzbget_user }}"
+    group: "{{ nzbget_group }}"
+  become: yes
+
+- name: Create scripts dir
+  file:
+    path: /opt/nzbget/scripts
+    state: directory
+    owner: "{{ nzbget_user }}"
+    group: "{{ nzbget_group }}"
+  become: yes
+
+- name: Copy scripts
+  copy:
+    src: "{{ item }}"
+    dest: "/opt/nzbget/scripts/{{ item }}"
+    owner: "{{ nzbget_user }}"
+    group: "{{ nzbget_group }}"
+    mode: 0750
+  become: yes
+  loop:
+    - Clean.py
+    - HashRenamer.py
+
+- name: Template config file
+  template:
+    src: nzbget.conf.j2
+    dest: /opt/nzbget/nzbget.conf
+    owner: "{{ nzbget_user }}"
+    group: "{{ nzbget_group }}"
+    mode: 0640
+  become: yes
+  notify: reload nzbget
+
+- name: Template webui template
+  template:
+    src: nzbget.conf.j2
+    dest: /opt/nzbget/webui/nzbget.conf.template
+    owner: "{{ nzbget_user }}"
+    group: "{{ nzbget_group }}"
+    mode: 0640
+  become: yes
+
+- name: Set nzbget dir owner
+  file:
+    path: /opt/nzbget
+    state: directory
+    recurse: yes
+    owner: "{{ nzbget_user }}"
+    group: "{{ nzbget_group }}"
+  become: yes
+
+- name: set MainDir owner
+  file:
+    path: "{{ nzbget_main_dir }}"
+    state: directory
+    owner: "{{ nzbget_user }}"
+    group: media
+  become: yes
+
+- name: Add service file
+  template:
+    src: nzbget.service.j2
+    dest: /etc/systemd/system/nzbget.service
+    mode: 0640
+  become: yes
+  notify: start nzbget

@@ -1,0 +1,13 @@
+- name: start nzbget
+  service:
+    name: nzbget.service
+    state: started
+    enabled: yes
+  become: yes
+
+- name: reload nzbget
+  service:
+    name: nzbget.service
+    state: reloaded
+    enabled: yes
+  become: yes
