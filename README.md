@@ -80,22 +80,22 @@ Note a domain registed through cloudflare is needed for the nginx container.
 
 The proxmox playbook will run on LXC containers hosted on a proxmox host. The current list is:
 
-- jellyfin - debian 11
+- jellyfin - debian 12
   - Runs jellyfin with (AMD) GPU passthrough
-- qbittorrent - ubuntu 22.04
+- qbittorrent - ubuntu 24.04
   - Runs qbittorrent-nox with wireguard
-- arr - ubuntu 20.04
-  - sonarr - installed through official repo
+- arr - ubuntu 24.04
+  - sonarr - manually installed
   - radarr - manually installed
   - bazarr - installed through python3 virtual env
   - jackett - manually installed
-- nginx - debian 11
+- nginx - debian 12
   - nginx - installed as a package
   - certbot - installed through pip (python3)
   - DDNS script - cloudflare dynamic DNS script (bash)
-- vtt/city - debian 11
+- vtt/city - debian 12
   - FoundryVTT running on node 14 LTS
-- nzbget
+- nzbget - ubuntu 24.04
   - nzbget - installed manually
 
 The following setup steps are to be done on the host OS in addition to running the `lxc-playbook.yml` targetting the containers:

@@ -1,58 +1,56 @@
-- name: Import Sonarr and Mono GPG keys
-  apt_key:
-    keyserver: keyserver.ubuntu.com
-    id: "{{ item }}"
-    state: present
-  loop:
-    - 2009837CBFFD68F45BC180471F4F90DE2A9B4BF8  # Sonarr
-    - 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF  # Mono
-  register: apt_key_result
-  retries: 3
-  until: apt_key_result is succeeded
-  become: yes
+- name: Check if Sonarr is installed
+  stat:
+    path: /opt/Sonarr/Sonarr
+  register: stat_sonarr
 
-- name: Import MediaInfo GPG Key
-  apt_key:
-    url: https://mediaarea.net/repo/deb/debian/pubkey.gpg
-    state: present
-  register: apt_key_result
-  retries: 3
-  until: apt_key_result is succeeded
-  become: yes
-
-- name: Add Sonarr, Mono and MediaInfo repositories
-  apt_repository:
-    repo: "{{ item }}"
-    state: present
-  loop:
-    - "deb https://apt.sonarr.tv/{{ ansible_distribution | lower }} \
-      {{ ansible_distribution_release }} main"
-    - "deb https://download.mono-project.com/repo/\
-      {{ ansible_distribution | lower }} \
-      stable-{{ ansible_distribution_release }} main"
-    - "deb https://mediaarea.net/repo/deb/{{ ansible_distribution | lower }} \
-      {{ ansible_distribution_release }} main"
-  become: yes
-
-- name: Install mono prereqs
-  package:
-    name:
-      - gnupg
-      - ca-certificates
-    state: present
-  become: yes
-
-- name: Install sonarr
-  apt:
-    name: sonarr
-    update_cache: yes
-    state: present
-  become: yes
-  notify: start sonarr
-
-- name: add sonarr to media group
+- name: Create sonarr user
   user:
     name: sonarr
-    groups: media
-    append: yes
+    group: media
+    system: yes
+    shell: /sbin/nologin
+    state: present
   become: yes
+
+- name: Create directories
+  file:
+    path: /var/lib/sonarr
+    owner: sonarr
+    group: media
+    state: directory
+  become: yes
+
+- name: Install prereqs
+  package:
+    name:
+      - curl
+      - sqlite3
+      - wget
+    state: present
+  become: yes
+
+- name: Get sonarr
+  get_url:
+    url: https://services.sonarr.tv/v1/download/main/latest?version={{ sonarr_version }}&os=linux&arch=x64
+    dest: /tmp/sonarr.{{ sonarr_version }}.linux.tar.gz
+  when: not stat_sonarr.stat.exists
+
+- name: Unarchive sonarr
+  unarchive:
+    src: /tmp/sonarr.{{ sonarr_version }}.linux.tar.gz
+    remote_src: yes
+    owner: sonarr
+    group: media
+    dest: /opt/
+    creates: /opt/Sonarr/Sonarr
+  become: yes
+  when: not stat_sonarr.stat.exists
+  notify: start sonarr
+
+- name: Template sonarr
+  template:
+    src: sonarr.service.j2
+    dest: /etc/systemd/system/sonarr.service
+    mode: 0664
+  become: yes
+  notify: start sonarr

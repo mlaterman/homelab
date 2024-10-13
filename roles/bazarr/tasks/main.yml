@@ -69,6 +69,6 @@
   template:
     src: bazarr.service.j2
     dest: /etc/systemd/system/bazarr.service
-    mode: 0666
+    mode: 0664
   become: yes
   notify: start bazarr
