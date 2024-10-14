@@ -1,13 +1,13 @@
-- name: Restart sshd
+- name: Start ddns
   ansible.builtin.service:
-    name: sshd
-    state: restarted
+    name: cf-ddns.service
+    state: started
     enabled: true
   become: true
 
-- name: Start unattended-upgrades
+- name: Start ddns timer
   ansible.builtin.service:
-    name: unattended-upgrades
+    name: cf-ddns.timer
     state: started
     enabled: true
   become: true

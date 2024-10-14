@@ -1,6 +1,0 @@
-- name: restart media-server
-  service:
-    name: media-server-compose.service
-    state: restarted
-    enabled: yes
-  become: yes

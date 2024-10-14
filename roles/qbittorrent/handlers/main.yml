@@ -1,13 +1,13 @@
-- name: wg0-up
-  service:
+- name: Wireguard up
+  ansible.builtin.service:
     name: wg-quick@wg0
     state: started
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
 
-- name: start qbittorrent-nox
-  service:
+- name: Start qbittorrent-nox
+  ansible.builtin.service:
     name: qbittorrent-nox
     state: started
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true

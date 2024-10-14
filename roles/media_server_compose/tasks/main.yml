@@ -1,0 +1,8 @@
+- name: Run storage tasks
+  ansible.builtin.import_tasks: storage.yml
+
+- name: Setup Jellyin dir
+  ansible.builtin.import_tasks: jellyfin.yml
+
+- name: Add compose service
+  ansible.builtin.import_tasks: compose.yml

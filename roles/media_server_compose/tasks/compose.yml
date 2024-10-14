@@ -1,0 +1,33 @@
+- name: Create server dir
+  ansible.builtin.file:
+    path: /opt/media-server
+    state: directory
+    owner: "{{ media_server_compose_user }}"
+    group: "{{ media_server_compose_group }}"
+    mode: '0750'
+  become: true
+
+- name: Add docker-compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: /opt/media-server/docker-compose.yml
+    owner: '{{ media_server_compose_user }}'
+    group: '{{ media_server_compose_group }}'
+    mode: '0640'
+  become: true
+  notify: Restart media-server
+
+- name: Add systemd service file
+  ansible.builtin.template:
+    src: media-server.service.j2
+    dest: /etc/systemd/system/media-server-compose.service
+    mode: '0644'
+  become: true
+  notify: restart media-server
+
+- name: Enable media-server
+  ansible.builtin.systemd:
+    name: media-server-compose.service
+    enabled: true
+    daemon_reload: true
+  become: true

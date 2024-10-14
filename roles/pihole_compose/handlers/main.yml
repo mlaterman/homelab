@@ -1,6 +1,6 @@
-- name: Start sonarr
+- name: Restart pihole
   ansible.builtin.service:
-    name: sonarr
+    name: pihole-compose.service
     state: restarted
     enabled: true
   become: true

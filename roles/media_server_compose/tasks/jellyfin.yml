@@ -1,0 +1,6 @@
+- name: Add user to video group
+  ansible.builtin.user:
+    name: "{{ media_server_compose_user }}"
+    groups: video
+    append: true
+  become: true

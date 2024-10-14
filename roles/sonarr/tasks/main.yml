@@ -1,56 +1,64 @@
 - name: Check if Sonarr is installed
-  stat:
+  ansible.builtin.stat:
     path: /opt/Sonarr/Sonarr
   register: stat_sonarr
 
 - name: Create sonarr user
-  user:
+  ansible.builtin.user:
     name: sonarr
     group: media
-    system: yes
+    system: true
     shell: /sbin/nologin
     state: present
-  become: yes
+  become: true
 
 - name: Create directories
-  file:
+  ansible.builtin.file:
     path: /var/lib/sonarr
     owner: sonarr
     group: media
     state: directory
-  become: yes
+    mode: '0755'
+  become: true
 
 - name: Install prereqs
-  package:
+  ansible.builtin.package:
     name:
       - curl
       - sqlite3
       - wget
     state: present
-  become: yes
+  become: true
 
 - name: Get sonarr
-  get_url:
+  ansible.builtin.get_url:
     url: https://services.sonarr.tv/v1/download/main/latest?version={{ sonarr_version }}&os=linux&arch=x64
     dest: /tmp/sonarr.{{ sonarr_version }}.linux.tar.gz
+    mode: '0644'
   when: not stat_sonarr.stat.exists
 
 - name: Unarchive sonarr
-  unarchive:
+  ansible.builtin.unarchive:
     src: /tmp/sonarr.{{ sonarr_version }}.linux.tar.gz
-    remote_src: yes
+    remote_src: true
     owner: sonarr
     group: media
     dest: /opt/
     creates: /opt/Sonarr/Sonarr
-  become: yes
+  become: true
   when: not stat_sonarr.stat.exists
-  notify: start sonarr
+  notify: Start sonarr
+
+- name: Remove sonarr download
+  ansible.builtin.file:
+    path: /tmp/sonarr.{{ sonarr_version }}.linux.tar.gz
+    state: absent
+  become: true
 
 - name: Template sonarr
-  template:
+  ansible.builtin.template:
     src: sonarr.service.j2
     dest: /etc/systemd/system/sonarr.service
-    mode: 0664
-  become: yes
-  notify: start sonarr
+    mode: '0644'
+  become: true
+  notify: Start sonarr

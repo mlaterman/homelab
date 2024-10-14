@@ -1,6 +1,0 @@
-- name: restart pihole
-  service:
-    name: pihole-compose.service
-    state: restarted
-    enabled: yes
-  become: yes

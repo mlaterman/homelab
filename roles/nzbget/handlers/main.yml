@@ -1,13 +1,13 @@
-- name: start nzbget
-  service:
+- name: Start nzbget
+  ansible.builtin.service:
     name: nzbget.service
     state: started
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
 
-- name: reload nzbget
-  service:
+- name: Reload nzbget
+  ansible.builtin.service:
     name: nzbget.service
     state: reloaded
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true

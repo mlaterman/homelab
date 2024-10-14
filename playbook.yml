@@ -1,19 +1,79 @@
-- hosts: all
-  roles:
-    - common
-
-- hosts: pihole
-  roles:
-    - docker
-    - pihole-compose
-
-- hosts: pi
-    - name: Install wireguard
-      package:
-        name: wireguard
+- name: Create shared group
+  hosts: jellyfin,qbittorrent,arr,nzbget
+  tasks:
+    - name: Create media group
+      ansible.builtin.group:
+        name: media
+        gid: 1000
         state: present
-      become: yes
+        system: true
+      become: true
+
+- name: Setup media server
+  hosts: jellyfin
+  tasks:
+    - name: Install mesa GPU drivers
+      ansible.builtin.package:
+        name: mesa-va-drivers
+        state: present
+      become: true
   roles:
+    - jellyfin
+
+- name: Setup qbittorrent
+  hosts: qbittorrent
+  roles:
+    - qbittorrent
+
+- name: Setup nzbget
+  hosts: nzbget
+  vars:
+    nzbget_server_name: "{{ usenet_server_name }}"
+    nzbget_server_host: "{{ usenet_server_host }}"
+    nzbget_server_port: "{{ usenet_server_port }}"
+    nzbget_server_user: "{{ usenet_username }}"
+    nzbget_server_pass: "{{ usenet_password }}"
+  roles:
+    - nzbget
+
+- name: Setup arr* stack
+  hosts: arr
   roles:
     - docker
-    - media-server-compose
+    - sonarr
+    - radarr
+    - bazarr
+    - jackett
+    - jellyseerr
+
+- name: Setup reverse proxy
+  hosts: nginx
+  vars:
+    nginx_domain: "{{ domain }}"
+    nginx_cf_token: "{{ cloudflare_token }}"
+    nginx_certbot_email: "{{ email }}"
+    cf_ddns_email: "{{ email }}"
+    cf_ddns_key: "{{ cloudflare_token }}"
+    cf_ddns_zone: "{{ cloudflare_zone }}"
+    cf_ddns_record: "{{ domain }}"
+  roles:
+    - cf_ddns
+    - nginx
+
+- name: Setup foundry
+  hosts: vtt
+  vars:
+    foundry_domain: "vtt.{{ domain }}"
+    foundry_key: # Admin key to access foundry
+    foundry_download_url: # Download URL for node archive
+  roles:
+    - foundry
+
+- name: Setup other foundry
+  hosts: city
+  vars:
+    foundry_domain: "city.{{ domain }}"
+    foundry_key: # Admin key to access foundry
+    foundry_download_url:  # Download URL for node archive
+  roles:
+    - foundry

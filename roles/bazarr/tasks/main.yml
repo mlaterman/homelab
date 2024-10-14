@@ -1,19 +1,19 @@
 - name: Check if bazarr is installed
-  stat:
+  ansible.builtin.stat:
     path: /opt/bazarr/bazarr.py
   register: stat_bazarr
 
 - name: Create bazarr user
-  user:
+  ansible.builtin.user:
     name: bazarr
     group: media
-    system: yes
+    system: true
     shell: /sbin/nologin
     state: present
-  become: yes
+  become: true
 
 - name: Install prereqs
-  package:
+  ansible.builtin.package:
     name:
       - unzip
       - python3-dev
@@ -21,54 +21,56 @@
       - python3-distutils
       - python3-venv
     state: present
-  become: yes
+  become: true
 
 - name: Download bazarr
-  get_url:
+  ansible.builtin.get_url:
     url: https://github.com/morpheus65535/bazarr/releases/latest/download/bazarr.zip
     dest: /tmp/bazarr.zip
+    mode: '0644'
   when: not stat_bazarr.stat.exists
 
 - name: Create directories
-  file:
+  ansible.builtin.file:
     path: /opt/bazarr
     owner: bazarr
     group: media
     state: directory
-  become: yes
+    mode: '0644'
+  become: true
 
 - name: Unarchive bazarr
-  unarchive:
+  ansible.builtin.unarchive:
     src: /tmp/bazarr.zip
-    remote_src: yes
+    remote_src: true
     dest: /opt/bazarr
     owner: bazarr
     group: media
     creates: /opt/bazarr/bazarr.py
-  become: yes
+  become: true
   when: not stat_bazarr.stat.exists
-  notify: start bazarr
+  notify: Start bazarr
 
-- name: create virtual env for bazarr
-  pip:
+- name: Create virtual env for bazarr
+  ansible.builtin.pip:
     name: ['pip', 'setuptools']
-    state: latest
+    state: present
     virtualenv: /opt/bazarr/venv
     virtualenv_command: /usr/bin/python3 -m venv
-  become: yes
+  become: true
   become_user: bazarr
 
-- name: install bazarr reqs
-  pip:
+- name: Install bazarr reqs
+  ansible.builtin.pip:
     requirements: /opt/bazarr/requirements.txt
     virtualenv: /opt/bazarr/venv
-  become: yes
+  become: true
   become_user: bazarr
 
-- name: create bazarr service file
-  template:
+- name: Create bazarr service file
+  ansible.builtin.template:
     src: bazarr.service.j2
     dest: /etc/systemd/system/bazarr.service
-    mode: 0664
-  become: yes
-  notify: start bazarr
+    mode: '0644'
+  become: true
+  notify: Start bazarr

@@ -1,0 +1,3 @@
+pihole_compose_user: '{{ ansible_user }}'
+pihole_compose_group: docker
+pihole_compose_password: letme1n

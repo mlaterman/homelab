@@ -1,31 +1,31 @@
 - name: Check if docker is installed
-  command: which docker
+  ansible.builtin.command: which docker
   register: wdocker
-  ignore_errors: yes
+  ignore_errors: true
   changed_when: false
 
-- name: Only run "update_cache=yes" if the last one is more than 3600 seconds ago
-  apt:
-    update_cache: yes
+- name: Only run "update_cache=true" if the last one is more than 3600 seconds ago
+  ansible.builtin.apt:
+    update_cache: true
     cache_valid_time: 3600
-  become: yes
+  become: true
   when: wdocker.rc == 1
 
 - name: Download install script
-  get_url:
+  ansible.builtin.get_url:
     url: https://get.docker.com
     dest: /tmp/get-docker.sh
-    mode: 0770
+    mode: '0750'
   when: wdocker.rc == 1
 
 - name: Run install script
-  shell: /tmp/get-docker.sh
-  become: yes
+  ansible.builtin.shell: /tmp/get-docker.sh
+  become: true
   when: wdocker.rc == 1
-  notify: start docker
+  notify: Start docker
 
 - name: Install packages needed for docker-compose
-  package:
+  ansible.builtin.package:
     name:
       - libffi-dev
       - libssl-dev
@@ -33,11 +33,11 @@
       - python3
       - python3-pip
     state: present
-  become: yes
+  become: true
 
 - name: Install docker-compose
-  pip:
+  ansible.builtin.pip:
     name: docker-compose
     executable: pip3
     state: present
-  become: yes
+  become: true

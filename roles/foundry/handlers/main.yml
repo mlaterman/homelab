@@ -1,6 +1,6 @@
-- name: restart foundry
-  service:
+- name: Restart foundry
+  ansible.builtin.service:
     name: foundryvtt.service
-    enabled: yes
+    enabled: true
     state: restarted
-  become: yes
+  become: true

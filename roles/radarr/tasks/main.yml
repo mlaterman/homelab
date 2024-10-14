@@ -1,56 +1,63 @@
 - name: Check if radarr is installed
-  stat:
+  ansible.builtin.stat:
     path: /opt/Radarr/Radarr
   register: stat_radarr
 
 - name: Create radarr user
-  user:
+  ansible.builtin.user:
     name: radarr
     group: media
-    system: yes
+    system: true
     shell: /sbin/nologin
     state: present
-  become: yes
+  become: true
 
 - name: Create directories
-  file:
+  ansible.builtin.file:
     path: /var/lib/radarr
     owner: radarr
     group: media
     state: directory
-  become: yes
+    mode: '0755'
+  become: true
 
 - name: Install prereqs
-  package:
+  ansible.builtin.package:
     name:
       - curl
       - sqlite3
     state: present
-  become: yes
+  become: true
 
-  # TODO support arm or arm64
 - name: Get radarr
-  get_url:
+  ansible.builtin.get_url:
     url: http://radarr.servarr.com/v1/update/master/updatefile?os=linux&runtime=netcore&arch=x64&version={{ radarr_version }}
     dest: /tmp/radarr.master.{{ radarr_version }}.linux.tar.gz
+    mode: '0644'
   when: not stat_radarr.stat.exists
 
 - name: Unarchive radarr
-  unarchive:
+  ansible.builtin.unarchive:
     src: /tmp/radarr.master.{{ radarr_version }}.linux.tar.gz
-    remote_src: yes
+    remote_src: true
     owner: radarr
     group: media
     dest: /opt/
     creates: /opt/Radarr/Radarr
-  become: yes
+  become: true
   when: not stat_radarr.stat.exists
-  notify: start radarr
+  notify: Start radarr
+
+- name: Remove download
+  ansible.builtin.file:
+    path: /tmp/radarr.master.{{ radarr_version }}.linux.tar.gz
+    state: absent
+  become: true
 
 - name: Template radarr
-  template:
+  ansible.builtin.template:
     src: radarr.service.j2
     dest: /etc/systemd/system/radarr.service
-    mode: 0664
-  become: yes
-  notify: start radarr
+    mode: '0644'
+  become: true
+  notify: Start radarr

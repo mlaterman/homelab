@@ -1,39 +1,40 @@
 - name: Check if jackett is installed
-  stat:
+  ansible.builtin.stat:
     path: /opt/Jackett/jackett
   register: stat_jackett
 
 - name: Create jackett user
-  user:
+  ansible.builtin.user:
     name: jackett
     group: media
-    system: yes
+    system: true
     shell: /sbin/nologin
     state: present
-  become: yes
+  become: true
 
 - name: Download jackett
-  get_url:
+  ansible.builtin.get_url:
     url: https://github.com/Jackett/Jackett/releases/download/{{ jackett_version }}/Jackett.Binaries.LinuxAMDx64.tar.gz
     dest: /tmp/jackett-{{ jackett_version }}.tar.gz
+    mode: '0644'
   when: not stat_jackett.stat.exists
 
 - name: Unarchive jackett
-  unarchive:
+  ansible.builtin.unarchive:
     src: /tmp/jackett-{{ jackett_version }}.tar.gz
-    remote_src: yes
+    remote_src: true
     dest: /opt/
     owner: jackett
     group: media
     creates: /opt/Jackett/jackett
-  become: yes
+  become: true
   when: not stat_jackett.stat.exists
-  notify: start jackett
+  notify: Start jackett
 
 - name: Create jackett service file
-  template:
+  ansible.builtin.template:
     src: jackett.service.j2
     dest: /etc/systemd/system/jackett.service
-    mode: 0666
-  become: yes
-  notify: start jackett
+    mode: '0644'
+  become: true
+  notify: Start jackett

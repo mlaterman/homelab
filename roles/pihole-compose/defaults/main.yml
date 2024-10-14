@@ -1,3 +1,0 @@
-pihole_user: '{{ ansible_user }}'
-pihole_group: docker
-pihole_password: letme1n

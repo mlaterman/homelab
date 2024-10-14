@@ -1,0 +1,4 @@
+media_server_compose_user: "{{ ansible_user }}"
+media_server_compose_group: ubuntu
+media_server_compose_dev_label: jellydata
+media_server_compose_fstype: ext4

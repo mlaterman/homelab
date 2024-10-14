@@ -1,40 +1,39 @@
 - name: Disable ssh remote root login
-  lineinfile:
-    dest: "{{ ssh_sshd_config }}"
+  ansible.builtin.lineinfile:
+    dest: "{{ common_ssh_sshd_config }}"
     regexp: "^#?PermitRootLogin"
     line: "PermitRootLogin no"
     state: present
-  notify:
-    - restart sshd
-  become: yes
+  notify: Restart sshd
+  become: true
 
 - name: Disable root login
-  command: passwd -l root
-  become: yes
+  ansible.builtin.user:
+    name: root
+    password: ''
+  become: true
 
 - name: Enable ssh strict mode
-  lineinfile:
-    dest: "{{ ssh_sshd_config }}"
+  ansible.builtin.lineinfile:
+    dest: "{{ common_ssh_sshd_config }}"
     regexp: "^#?StrictModes"
-    line: "StrictModes yes"
+    line: "StrictModes true"
     state: present
-  notify:
-    - restart sshd
-  become: yes
+  notify: Restart sshd
+  become: true
 
 - name: Disable X11 forwarding
-  lineinfile:
-    dest: "{{ ssh_sshd_config }}"
+  ansible.builtin.lineinfile:
+    dest: "{{ common_ssh_sshd_config }}"
     regexp: "^#?X11Forwarding"
     line: "X11Forwarding no"
     state: present
-  notify:
-    - restart sshd
-  become: yes
+  notify: Restart sshd
+  become: true
 
 - name: Disable ssh password login
-  lineinfile:
-    dest: "{{ ssh_sshd_config }}"
+  ansible.builtin.lineinfile:
+    dest: "{{ common_ssh_sshd_config }}"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
     state: present
@@ -47,13 +46,12 @@
       line: "UsePAM no"
     - regexp: "^#?PermitEmptyPasswords"
       line: "PermitEmptyPasswords no"
-  notify:
-    - restart sshd
-  become: yes
+  notify: Restart sshd
+  become: true
 
 - name: Install unattened upgrades
-  package:
+  ansible.builtin.package:
     name: unattended-upgrades
     state: present
-  become: yes
-  notify: start unattended-upgrades
+  become: true
+  notify: Start unattended-upgrades

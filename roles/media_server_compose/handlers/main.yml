@@ -1,6 +1,6 @@
-- name: Start sonarr
+- name: Restart media-server
   ansible.builtin.service:
-    name: sonarr
+    name: media-server-compose.service
     state: restarted
     enabled: true
   become: true

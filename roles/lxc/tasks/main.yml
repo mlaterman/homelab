@@ -1,19 +1,19 @@
 - name: Install LXC
-  package:
+  ansible.builtin.package:
     name:
       - lxc
       - debootstrap
       - bridge-utils
-     #- libvirt-bin
       - libvirt0
       - libpam-cgfs
       - bridge-utils
       - uidmap
+     # - libvirt-bin
     state: present
-  become: yes
+  become: true
 
 - name: Install packages for host-bridge
-  package:
+  ansible.builtin.package:
     name:
       - libvirt-clients
       - libvirt-daemon-system
@@ -23,59 +23,65 @@
       - libxml2-utils
       - iproute2
     state: present
-  become: yes
+  become: true
 
 - name: Copy default config
-  copy:
+  ansible.builtin.copy:
     src: default.conf
     dest: /etc/lxc/default.conf
-    mode: 0644
-  become: yes
+    mode: '0644'
+  become: true
 
 - name: Start default network
-  command: virsh net-start default
-  notify: autostart virsh
+  ansible.builtin.command: virsh net-start default
+  notify: Autostart virsh
   register: virsh
   failed_when:
     - virsh.rc != 0
     - '"network is already active" not in virsh.stderr'
   changed_when: virsh == 0
-  become: yes
+  become: true
 
 - name: LXC user networking
-  template:
+  ansible.builtin.template:
     src: lxc-usernet.j2
     dest: /etc/lxc/lxc-usernet
-    mode: 0644
-  become: yes
+    mode: '0644'
+  become: true
 
 - name: Create user config dir
-  file:
+  ansible.builtin.file:
     path: "{{ lookup('env', 'HOME') }}/.config/lxc"
     state: directory
-  become: yes
+    mode: '0750'
+  become: true
 
-- name: get user sub uid and gid
+- name: Get user ids
   block:
-    - shell: "grep {{ ansible_user }} /etc/subuid  | cut -d : -f 2"
+    - name: Get ms uid
+      ansible.builtin.shell: "set -o pipefail; grep {{ ansible_user }} /etc/subuid  | cut -d : -f 2"
       register: sh_ms_uid
-      changed_when: False
-    - shell: "grep {{ ansible_user }} /etc/subuid  | cut -d : -f 3"
+      changed_when: false
+    - name: Get me uid
+      ansible.builtin.shell: "set -o pipefail; grep {{ ansible_user }} /etc/subuid  | cut -d : -f 3"
       register: sh_me_uid
-      changed_when: False
-    - shell: "grep {{ ansible_user }} /etc/subgid  | cut -d : -f 2"
+      changed_when: false
+    - name: Get ms gid
+      ansible.builtin.shell: "set -o pipefail; grep {{ ansible_user }} /etc/subgid  | cut -d : -f 2"
       register: sh_ms_gid
-      changed_when: False
-    - shell: "grep {{ ansible_user }} /etc/subgid  | cut -d : -f 3"
+      changed_when: false
+    - name: Get me gid
+      ansible.builtin.shell: "set -o pipefail; grep {{ ansible_user }} /etc/subgid  | cut -d : -f 3"
       register: sh_me_gid
-      changed_when: False
+      changed_when: false
 
 - name: Template user config
-  template:
+  ansible.builtin.template:
     src: default.conf.j2
     dest: "{{ lookup('env', 'HOME') }}/.config/lxc/default.conf"
-  become: yes
+    mode: '0644'
+  become: true
 
 - name: Allow lingering sessions
-  command: loginctl enable-linger {{ ansible_user }}
-  become: yes
+  ansible.builtin.command: loginctl enable-linger {{ ansible_user }}
+  become: true

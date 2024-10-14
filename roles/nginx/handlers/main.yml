@@ -1,39 +1,39 @@
-- name: start nginx
-  service:
+- name: Start nginx
+  ansible.builtin.service:
     name: nginx
     state: started
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
 
-- name: reload nginx
-  service:
+- name: Reload nginx
+  ansible.builtin.service:
     name: nginx
     state: reloaded
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
 
-- name: enable certbot renew
-  service:
+- name: Enable certbot renew
+  ansible.builtin.service:
     name: certbot-renew.service
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
 
-- name: start certbot renew timer
-  service:
+- name: Start certbot renew timer
+  ansible.builtin.service:
     name: certbot-renew.timer
     state: started
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
 
-- name: enable certbot update
-  service:
+- name: Enable certbot update
+  ansible.builtin.service:
     name: certbot-update.service
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
 
-- name: start certbot update timer
-  service:
+- name: Start certbot update timer
+  ansible.builtin.service:
     name: certbot-update.timer
     state: started
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true

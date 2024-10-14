@@ -1,16 +1,41 @@
-[pi]
-192.168.68.106
+[jellyfin]
+192.168.1.68
 
-[pi:vars]
-ansible_user=ubuntu
+[jellyfin:vars]
+ansible_user=root
 
-[pihole]
-192.168.68.107
+[qbittorrent]
+192.168.1.69
 
-[pihole:vars]
-ansible_user=pi
+[qbittorrent:vars]
+ansible_user=root
 
-[nas]
-192.168.68.123
+[arr]
+192.168.1.70
 
-[nas:vars]
+[arr:vars]
+ansible_user=root
+
+[nginx]
+192.168.1.71
+
+[nginx:vars]
+ansible_user=root
+
+[vtt]
+192.168.1.73
+
+[vtt:vars]
+ansible_user=root
+
+[city]
+192.168.1.74
+
+[city:vars]
+ansible_user=root
+
+[nzbget]
+192.168.1.129
+
+[nzbget:vars]
+ansible_user=root

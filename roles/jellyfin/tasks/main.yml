@@ -1,32 +1,32 @@
 - name: Install extrepo
-  package:
+  ansible.builtin.package:
     name: extrepo
     state: present
-  become: yes
+  become: true
 
 - name: Enable jellyfin repo
-  command: extrepo enable jellyfin
-  args:
+  ansible.builtin.command:
+    cmd: extrepo enable jellyfin
     creates: /etc/apt/sources.list.d/extrepo_jellyfin.sources
-  become: yes
+  become: true
 
 - name: Install jellyfin
-  package:
+  ansible.builtin.package:
     name: jellyfin
     state: present
-  become: yes
-  notify: start jellyfin
+  become: true
+  notify: Start jellyfin
 
 - name: Add jellyfin user to media group
-  user:
+  ansible.builtin.user:
     name: jellyfin
     groups: media
-    append: yes
-  become: yes
+    append: true
+  become: true
 
 - name: Add jellyfin user to render group
-  user:
+  ansible.builtin.user:
     name: jellyfin
     groups: render
-    append: yes
-  become: yes
+    append: true
+  become: true

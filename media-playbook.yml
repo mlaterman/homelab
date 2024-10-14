@@ -1,0 +1,22 @@
+- name: Run common tasks
+  hosts: all
+  roles:
+    - common
+
+- name: Setup pihole
+  hosts: pihole
+  roles:
+    - docker
+    - pihole_compose
+
+- name: Setup media server
+  hosts: pi
+  tasks:
+    - name: Install wireguard
+      ansible.builtin.package:
+        name: wireguard
+        state: present
+      become: true
+  roles:
+    - docker
+    - media_server_compose

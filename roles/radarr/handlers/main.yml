@@ -1,6 +1,6 @@
-- name: start radarr
-  service:
+- name: Start radarr
+  ansible.builtin.service:
     name: radarr.service
     state: started
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true

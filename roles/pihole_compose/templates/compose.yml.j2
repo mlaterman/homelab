@@ -13,7 +13,7 @@ services:
       - "80:80/tcp"
     environment:
       TZ: 'America/Vancouver'
-      WEBPASSWORD: {{ pihole_password }}
+      WEBPASSWORD: {{ pihole_compose_password }}
       FTLCONF_REPLY_ADDR4: {{ ansible_default_ipv4.address }}
       DNSMASQ_LISTENING: all
     # Volumes store your data between container upgrades

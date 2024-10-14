@@ -4,3 +4,4 @@ foundry_dir: /usr/local/foundry-vtt
 foundry_domain:
 foundry_key:
 foundry_download_url:
+foundry_nodejs_version: 22.x

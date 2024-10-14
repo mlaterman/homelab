@@ -2,46 +2,16 @@
 
 homelab will install and configure machines to self host resources.
 
-## Setup
-
-Targets ubuntu/debian (Raspbian) OS'.
+## Prereqs
 
 - Install ansible (under a python3 venv).
 - Add public ssh key to `~/.ssh/authorized_keys` on target instances.
 - Assign nodes static IP addresses through a router.
-
-## pihole
-
-Pihole will run under docker compose on an instance.
-Systemd is used to ensure it starts on system boot
-
-After deploying pihole set the primary DNS setting (in DHCP options) on the router to pihole's IP.
-
-## media server (old)
-
-The Media server runs jellyfin, qbittorrent, sonarr, and radarr in docker compose.
-
-The drive that is used by the media server should have the following structure:
-```
-/apps/
-  qbittorrent/
-    wireguard/
-      wg0.conf
-  sonarr/
-  radarr/
-  jellyfin/
-/data/
-  media/
-    movies/
-    tvshows/
-  torrent/
-```
-
-A wireguard dir and config file must be present in the qbittorrent directory to ensure that a vpn is used.
+- Have a domain on Cloudflare as well as an API key (optional)
 
 ## Proxmox
 
-Proxmox is used as the base platform to run services (excluding pihole).
+Proxmox is used as the base platform to run services.
 
 A ZFS filesystem needs to be created and mounted to the containers. And some other packages need to be installed:
 
@@ -100,7 +70,7 @@ The proxmox playbook will run on LXC containers hosted on a proxmox host. The cu
 - nzbget - ubuntu 24.04
   - nzbget - installed manually
 
-The following setup steps are to be done on the host OS in addition to running the `lxc-playbook.yml` targetting the containers:
+The following setup steps are to be done on the host OS in addition to running `playbook.yml` targetting the containers:
 
 ### jellyfin setup
 
@@ -185,3 +155,36 @@ To mount a zfs filesystem as a bind-mount to an LXC container (ID 109):
 ```sh
 pct set 109 -mp0 /tank/jellydata/download/usenet,mp=/jellydata/download/usenet
 ```
+
+## Old Setup
+
+Targets ubuntu/debian (Raspbian) OS'.
+
+## pihole
+
+Pihole will run under docker compose on an instance.
+Systemd is used to ensure it starts on system boot
+
+After deploying pihole set the primary DNS setting (in DHCP options) on the router to pihole's IP.
+
+## media server (old)
+
+The Media server runs jellyfin, qbittorrent, sonarr, and radarr in docker compose.
+
+The drive that is used by the media server should have the following structure:
+```
+/apps/
+  qbittorrent/
+    wireguard/
+      wg0.conf
+  sonarr/
+  radarr/
+  jellyfin/
+/data/
+  media/
+    movies/
+    tvshows/
+  torrent/
+```
+
+A wireguard dir and config file must be present in the qbittorrent directory to ensure that a vpn is used.

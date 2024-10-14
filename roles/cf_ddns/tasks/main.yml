@@ -1,0 +1,56 @@
+- name: Install prereqs
+  ansible.builtin.package:
+    name: curl
+    state: present
+  become: true
+
+- name: Create cf ddns group
+  ansible.builtin.group:
+    name: "{{ cf_ddns_group }}"
+    system: true
+    state: present
+  become: true
+
+- name: Create cf ddns user
+  ansible.builtin.user:
+    name: "{{ cf_ddns_user }}"
+    group: "{{ cf_ddns_group }}"
+    system: true
+    shell: /sbin/nologin
+    state: present
+  become: true
+
+- name: Create user script dir
+  ansible.builtin.file:
+    path: /home/{{ cf_ddns_user }}/bin
+    state: directory
+    owner: "{{ cf_ddns_user }}"
+    group: "{{ cf_ddns_group }}"
+    mode: '0700'
+  become: true
+
+- name: Copy ddns script
+  ansible.builtin.template:
+    src: cloudflare.sh.j2
+    dest: /home/cf-ddns/bin/cloudflare.sh
+    owner: "{{ cf_ddns_user }}"
+    group: "{{ cf_ddns_group }}"
+    mode: '0750'
+  become: true
+  notify: Start ddns
+
+- name: Add cf ddns service file
+  ansible.builtin.template:
+    src: cf-ddns.service.j2
+    dest: /etc/systemd/system/cf-ddns.service
+    mode: '0644'
+  become: true
+  notify: Start ddns
+
+- name: Add cf ddns timer file
+  ansible.builtin.template:
+    src: cf-ddns.timer.j2
+    dest: /etc/systemd/system/cf-ddns.timer
+    mode: '0644'
+  become: true
+  notify: Start ddns timer

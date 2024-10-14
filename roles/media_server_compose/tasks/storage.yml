@@ -1,0 +1,17 @@
+- name: Create mount point
+  ansible.builtin.file:
+    path: /mnt/jellydata
+    state: directory
+    owner: "{{ media_server_compose_user }}"
+    group: "{{ media_server_compose_group }}"
+    mode: '0775'
+  become: true
+
+- name: Mount external hdd
+  ansible.posix.mount:
+    path: /mnt/jellydata
+    src: 'LABEL={{ media_server_compose_dev_label }}'
+    fstype: '{{ media_server_compose_fstype }}'
+    opts: defaults,auto,user,nofail,noatime
+    state: mounted
+  become: true

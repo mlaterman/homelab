@@ -1,47 +1,47 @@
 - name: Install wireguard
-  package:
+  ansible.builtin.package:
     name:
       - wireguard
       - openresolv
     state: present
-  become: yes
+  become: true
 
 - name: Copy wireguard conf
-  template:
+  ansible.builtin.template:
     source: wg0.conf.j2
     dest: /etc/wireguard/wg0.conf
-    mode: 0666
-  become: yes
-  notify: wg0-up
+    mode: '0644'
+  become: true
+  notify: Wireguard up
 
 - name: Create qbittorrent group
-  group:
+  ansible.builtin.group:
     name: "{{ qbittorrent_group }}"
-    system: yes
+    system: true
     state: present
-  become: yes
+  become: true
 
 - name: Create qbittorrent user
-  user:
+  ansible.builtin.user:
     name: "{{ qbittorrent_user }}"
     group: "{{ qbittorrent_group }}"
     groups: media
-    system: yes
+    system: true
     shell: /sbin/nologin
-    append: yes
+    append: true
     state: present
-  become: yes
+  become: true
 
 - name: Install qbittorrent-nox
-  package:
+  ansible.builtin.package:
     name: qbittorrent-nox
     state: present
-  become: yes
+  become: true
 
 - name: Template qbittorrent-nox systemd service file
-  template:
+  ansible.builtin.template:
     source: qbittorrent-nox.service.j2
     dest: /etc/systemd/system/qbittorrent-nox.service
-    mode: 0666
-  become: yes
-  notify: start qbittorrent-nox
+    mode: '0644'
+  become: true
+  notify: Start qbittorrent-nox
