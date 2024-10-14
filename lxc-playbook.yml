@@ -24,10 +24,12 @@
 
 - hosts: arr
   roles:
+    - docker
     - sonarr
     - radarr
     - bazarr
     - jackett
+    - jellyseerr
 
 - hosts: nginx
   vars:

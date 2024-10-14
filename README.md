@@ -85,10 +85,12 @@ The proxmox playbook will run on LXC containers hosted on a proxmox host. The cu
 - qbittorrent - ubuntu 24.04
   - Runs qbittorrent-nox with wireguard
 - arr - ubuntu 24.04
+  - docker - installed as a package
   - sonarr - manually installed
   - radarr - manually installed
   - bazarr - installed through python3 virtual env
   - jackett - manually installed
+  - jellyseerr - ran via docker-compose
 - nginx - debian 12
   - nginx - installed as a package
   - certbot - installed through pip (python3)

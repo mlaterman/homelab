@@ -1,0 +1,6 @@
+- name: start jellyseerr
+  service:
+    name: jellyseerr.service
+    state: started
+    enabled: yes
+  become: yes

@@ -1,0 +1,44 @@
+- name: Create jellyseerr group
+  group:
+    name: "{{ jellyseerr_group }}"
+    system: yes
+    state: present
+  become: yes
+
+- name: Create jellyseerr user
+  user:
+    name: "{{ jellyseerr_user }}"
+    group: media
+    groups:
+      - "{{ jellyseerr_group }}"
+      - docker
+    system: yes
+    shell: /bin/nologin
+    append: yes
+    state: present
+  become: yes
+
+- name: Create jellyseerr dir
+  file:
+    path: /opt/jellyseerr
+    state: directory
+    owner: "{{ jellyseerr_user }}"
+    group: "{{ jellyseerr_group }}"
+  become: yes
+
+- name: template compose file
+  template:
+    src: compose.yml.j2
+    dest: /opt/jellyseerr/compose.yml
+    owner: "{{ jellyseerr_user }}"
+    group: "{{ jellyseerr_group }}"
+  become: yes
+
+- name: pull images
+  command: docker compose -f /opt/jellyseerr/compose.yml pull
+
+- name: template service file
+  template:
+    src: jellyseerr.service.j2
+    dest: /etc/systemd/system/jellyseerr.service
+  notify: start jellyseerr
