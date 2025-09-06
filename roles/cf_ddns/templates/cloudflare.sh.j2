@@ -28,7 +28,7 @@ auth_method="{{ cf_ddns_method }}"                  # Set to "global" for Global
 auth_key="{{ cf_ddns_key }}"                        # Your API Token or Global API Key
 zone_identifier="{{ cf_ddns_zone }}"                # Can be found in the "Overview" tab of your domain
 record_name="{{ cf_ddns_record }}"                  # Which record you want to be synced
-ttl="3600"                                          # Set the DNS TTL (seconds)
+ttl=3600                                            # Set the DNS TTL (seconds)
 proxy="false"                                       # Set the proxy to true or false
 
 ###########################################
@@ -99,7 +99,7 @@ update=$(curl -s -X PATCH "https://api.cloudflare.com/client/v4/zones/$zone_iden
                      -H "X-Auth-Email: $auth_email" \
                      -H "$auth_header $auth_key" \
                      -H "Content-Type: application/json" \
-                     --data "{\"type\":\"A\",\"name\":\"$record_name\",\"content\":\"$ip\",\"ttl\":\"$ttl\",\"proxied\":${proxy}}")
+                     --data "{\"type\":\"A\",\"name\":\"$record_name\",\"content\":\"$ip\",\"ttl\":$ttl,\"proxied\":${proxy}}")
 
 ###########################################
 ## Report the status
